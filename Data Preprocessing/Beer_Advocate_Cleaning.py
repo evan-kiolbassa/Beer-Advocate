@@ -31,16 +31,12 @@ def production_cleaning():
 def scraped_cleaning():
     beer_advocate = pd.read_csv("advocate_data.csv")
     beer_advocate = beer_advocate.dropna(subset = ['avg_rating'])
+    beer_advocate = beer_advocate.apply(lambda x: x.str.replace(',',""))
     beer_advocate['total_rank'] = beer_advocate['total_rank'].filter(regex = '\d+')
     beer_advocate['total_rank'] = beer_advocate['total_rank'].str.replace('<a href="/beer/top-rated/" class="Tooltip" title="Ranking against all beers. Click to view the Top 250 Rated Beers.">Ranked #',"")
     beer_advocate['total_rank'] = beer_advocate['total_rank'].str.replace('</a>', '')
-    beer_advocate['total_rank'] = beer_advocate['total_rank'].str.replace(',', '')
-    beer_advocate['total_rank'] = beer_advocate['total_rank'].astype(float)
     beer_advocate['style_rank'] = beer_advocate['style_rank'].str.replace('Ranked #',"")
-    beer_advocate['style_rank'] = beer_advocate['style_rank'].str.replace(',',"")
-    beer_advocate['style_rank'] = beer_advocate['style_rank'].astype(float)
-    beer_advocate['num_ratings'] = beer_advocate['num_ratings'].str.replace(',',"")
-    beer_advocate['num_ratings'] = beer_advocate['num_ratings'].astype(float)
+    beer_advocate.loc[:, ['total_rank', 'style_rank', 'num_ratings']] = beer_advocate.loc[:, ['total_rank', 'style_rank', 'num_ratings']].apply(lambda x: x.astype(float))
     beer_advocate['beer_desc'] = beer_advocate['beer_desc'].str.strip(',\n')
     
     return beer_advocate
